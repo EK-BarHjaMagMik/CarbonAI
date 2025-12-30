@@ -1,197 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Open AI Demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous"></script>
+    <title>Opskrifts API Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="css/main.css">
-    <script defer src="js/main.js"></script>
+    <script defer src="./js/script.js"></script>
 </head>
 
 <body>
 
 <div class="container">
-    <h2>Open AI Demo</h2>
+    <h2>Opskrifts API Demo</h2>
 
-    <p>This Open AI project demonstrates 3 ways to use Open AI's Chat Completion API</p>
-    <ol>
-        <li>A simple possible example requesting the API for a joke, given a topic.</li>
-        <li>Same example as above, but with IP-rate limiting.</li>
-        <li>An example on how to feed your own info into the API-request.</li>
-    </ol>
-    <br>
-    <div class="row">
-        <div class="column text-center">
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#infoModal">
-            Important read!
-        </button>
-        </div>
-    </div>
-    <div class="container">
+    <p>Dette projekt demonstrerer, hvordan man kan bruge Opskrifts API'et til at finde opskrifter.</p>
 
-        <div class="card m-3">
-            <div class="card-body">
-                <h5 class="card-title">Get Joke (simple)</h5>
-                <form id="form-joke" class="container">
+    <div class="card m-3">
+        <div class="card-body">
+            <h5 class="card-title">Find Opskrift</h5>
+            <form id="form-recipe" class="container">
 
-                    <div class="row">
-                        <p class="card-text">The simplest possible example, requesting the API for a joke, given a
-                            topic.</p>
-                        <label for="about">Topic</label> <input type="text" id="about" class="result"
-                                                                placeholder="Enter topic for a joke">
-                    </div>
-                    <div class="row mt-3">
-                        <div class="column text-end">
-                            <button type="submit" class="btn btn-primary" id="btn-get-joke">Get Joke</button>
-                        </div>
-                    </div>
-                </form>
-                <div id="spinner1" class="spinner-border text-success" role="status"
-                     style="margin-left:1em;border-radius: 50%;display:none;">
-                    <span class="visually-hidden">Loading...</span>
+                <div class="row">
+                    <label for="recipe-name">Opskriftens navn</label>
+                    <input type="text" id="recipe-name" class="form-control" placeholder="Indtast opskriftens navn">
                 </div>
-                <p id="result" class="result"></p>
-
+                <div class="row mt-3">
+                    <div class="col text-end">
+                        <button type="submit" class="btn btn-primary" id="btn-get-recipe">Find Opskrift</button>
+                    </div>
+                </div>
+            </form>
+            <div id="spinner" class="spinner-border text-success" role="status" style="display:none;">
+                <span class="visually-hidden">Indlæser...</span>
             </div>
-        </div>
-
-
-        <div class="card m-3">
-            <div class="card-body">
-                <h5 class="card-title">Get Joke (with IP-rate limiting)</h5>
-
-                <form id="form-joke2" class="container">
-
-                    <div class="row">
-                        <p class="card-text">Same as above, but with IP-rate limitation.</p>
-                        <label for="about2">Topic</label> <input type="text" id="about2"
-                                                                 placeholder="Enter topic for a joke">
-                    </div>
-                    <div class="row mt-3">
-                        <div class="column text-end">
-                            <button class="btn btn-primary" id="btn-get-joke2">Get Joke (with IP-rate limiting)</button>
-                        </div>
-                    </div>
-                </form>
-
-                <div id="spinner2" class="spinner-border text-success" role="status"
-                     style="margin-left:1em;border-radius: 50%;display:none;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-
-                <p id="result2" class="result"></p>
-            </div>
-        </div>
-
-        <div class="card m-3">
-            <div class="card-body">
-                <h5 class="card-title">Demonstrates how to feed own info into the API-request</h5>
-
-                <form id="form-answer">
-                    <div class="row">
-                    <div class="column mb-3">
-
-                        <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#owninfoModal">
-                            How to use this example!
-                        </button>
-                    </div>
-                    </div>
-                    <div class="container">
-
-                        <div class="row">
-          <label for="the-question">Question </label><textarea cols="100" rows="3" id="the-question"
-                    placeholder="Enter a question related to this ChatGPT example"></textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="column text-end mt-3">
-                                <button type="submit" class="btn btn-primary" id="btn-get-answer">Get answer</button>
-                            </div>
-                        </div>
-                        <div id="spinner3" class="spinner-border-lg spinner-border text-success" role="status"
-                             style="margin:1em;border-radius: 50%;display:none;width: 3rem; height: 3rem;">
-                            <span class=" visually-hidden">Loading...</span>
-                        </div>
-
-                    </div>
-                </form>
-                <p id="result3" class="result"></p>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Modal 1 Disclaimer about Deployment -->
-    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Important Message</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    This example is hosted as a single web app, which is definitely not
-                    recommended for a professional solution.<br/>
-                    Instead a real solution should be split in a distributed way, with<br>
-                    - a frontend app (in a separate repository) and<br/>
-                    - a backend app (in a separate repository).
-                    <br/>
-                    <br/>
-                    For everything but simple demo's like this, your backend and frontend should be hosted on separate
-                    servers.
-                    <br/>
-                    <br/>
-                    Here, this arrangement is employed to provide a simple example that includes both the API and hints
-                    on
-                    how you can design a client for the API.
-                    <br/>
-                    <br/>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Modal 2 Hints related to the owninfo endpoint -->
-    <div class="modal fade" id="owninfoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">How to use this example (own info)</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    This example shows it is possible, via this prompt, to reply with personal
-                    information, which the AI model has not been trained with.
-                    <br/>
-                    <br/>
-                    Try to write a question inspired by the following (but formulated in your own way)
-                    <ul>
-                        <li>Who made this ChatGPT example</li>
-                        <li>Where do I find this code</li>
-                        <li>Does the author of this example have a website</li>
-                    </ul>
-                    <br/>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
+            <p id="result" class="result"></p>
         </div>
     </div>
 </div>
-</body>
 
+</body>
 </html>

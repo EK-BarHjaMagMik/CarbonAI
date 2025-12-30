@@ -1,7 +1,7 @@
-package com.example.chatgptjokes.service;
+package com.example.madopskrifter.service;
 
-import com.example.chatgptjokes.dtos.ChatCompletionResponse;
-import com.example.chatgptjokes.dtos.MyResponse;
+import com.example.madopskrifter.dtos.ChatCompletionResponse;
+import com.example.madopskrifter.dtos.MyResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

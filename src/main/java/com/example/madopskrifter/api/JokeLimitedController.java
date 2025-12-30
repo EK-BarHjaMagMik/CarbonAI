@@ -1,7 +1,7 @@
-package com.example.chatgptjokes.api;
+/* package com.example.madopskrifter.api;
 
-import com.example.chatgptjokes.dtos.MyResponse;
-import com.example.chatgptjokes.service.OpenAiService;
+import com.example.madopskrifter.dtos.MyResponse;
+import com.example.madopskrifter.service.OpenAiService;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class handles fetching a joke via the ChatGPT API, but is IP-rate limited.
- */
+
 @RestController
 @RequestMapping("/api/v1/jokelimited")
 @CrossOrigin(origins = "*")
@@ -39,7 +39,7 @@ public class JokeLimitedController {
   /**
    * The controller called from the browser client.
    * @param service
-   */
+
   public JokeLimitedController(OpenAiService service) {
     this.service=service;
   }
@@ -47,7 +47,7 @@ public class JokeLimitedController {
   /**
    * Creates the bucket for handling IP-rate limitations.
    * @return bucket
-   */
+
   private Bucket createNewBucket() {
     Bandwidth limit = Bandwidth.classic(BUCKET_CAPACITY, Refill.greedy(REFILL_AMOUNT, Duration.ofMinutes(REFILL_TIME)));
     return Bucket.builder().addLimit(limit).build();
@@ -57,7 +57,7 @@ public class JokeLimitedController {
    * Returns an existing bucket via ket or creates a new one.
    * @param key the IP address
    * @return bucket
-   */
+
   private Bucket getBucket(String key) {
     return buckets.computeIfAbsent(key, k -> createNewBucket());
   }
@@ -67,7 +67,7 @@ public class JokeLimitedController {
    * @param about about contains the input that ChatGPT uses to make a joke about.
    * @param request the current HTTP request used
    * @return the response from ChatGPT.
-   */
+
   @GetMapping()
   public MyResponse getJokeLimited(@RequestParam String about, HttpServletRequest request) {
 
@@ -81,6 +81,6 @@ public class JokeLimitedController {
       throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, try again later");
     }
     // Otherwise request a joke and return the response.
-    return service.makeRequest(about, JokeController.SYSTEM_MESSAGE);
+    return service.makeRequest(about, RecipeController.SYSTEM_MESSAGE);
   }
-}
+}*/
