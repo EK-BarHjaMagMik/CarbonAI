@@ -10,11 +10,11 @@ public class TravelMathUtil {
         double lon1rad = Math.toRadians(lon1);
         double lat2rad = Math.toRadians(lat2);
         double lon2rad = Math.toRadians(lon2);
-        double disance = Math.acos(Math.sin(lat1rad) * Math.sin(lat2rad) + Math.cos(lat1rad) * Math.cos(lat2rad) * Math.cos(lon1rad - lon2rad));
-        disance = Math.toDegrees(disance);
-        disance = disance * 60 * 1.1515;
-        disance = disance * 1.609344;
-        return disance;
+        double distance = Math.acos(Math.sin(lat1rad) * Math.sin(lat2rad) + Math.cos(lat1rad) * Math.cos(lat2rad) * Math.cos(lon1rad - lon2rad));
+        distance = Math.toDegrees(distance);
+        distance = distance * 60 * 1.1515;
+        distance = distance * 1.609344;
+        return distance;
     }
 
     //Adds 1.3 distance penalty for cars/trains since haversine is a straight line great for planes not for roads.
