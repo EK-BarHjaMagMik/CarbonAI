@@ -30,11 +30,10 @@ public class GeminiService {
 
   public static final Logger logger = LoggerFactory.getLogger(GeminiService.class);
 
-  @Value("${app.api-key}")
+  // TODO:
+  /*
+  @Value("${app.gemini-api-key}")
   private String API_KEY;
-
-  //See here for a decent explanation of the parameters send to the API via the requestBody
-  //https://platform.openai.com/docs/api-reference/completions/create
 
   @Value("${app.url}")
   public String URL;
@@ -56,14 +55,14 @@ public class GeminiService {
 
   @Value("${app.top_p}")
   public double TOP_P;
-
+*/
   private WebClient client;
 
   public GeminiService() {
     this.client = WebClient.create();
   }
 
-  //Use this constructor for testing, to inject a mock client
+  // Use this constructor for testing, to inject a mock client
   public GeminiService(WebClient client) {
     this.client = client;
   }
