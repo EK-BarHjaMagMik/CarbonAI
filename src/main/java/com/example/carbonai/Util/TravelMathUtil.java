@@ -1,4 +1,4 @@
-package com.example.carbonai.TravelMathUtil;
+package com.example.carbonai.Util;
 
 import com.example.carbonai.enums.TravelMode;
 
