@@ -17,9 +17,9 @@ public class TravelMathUtil {
         return distance;
     }
 
-    //Adds 1.3 distance penalty for cars/trains since haversine is a straight line great for planes not for roads.
+    //Adds 1.3 distance penalty for cars/trains/buses since haversine is a straight line great for planes, not for roads.
     public static double applyRoadMultiplier(double distance, TravelMode mode) {
-        if (mode ==TravelMode.CAR || mode == TravelMode.TRAIN) {
+        if (mode == TravelMode.CAR || mode == TravelMode.TRAIN || mode == TravelMode.BUS) {
             return distance * 1.3;
         }
         return distance;
@@ -29,9 +29,9 @@ public class TravelMathUtil {
         double travelHours = distance / mode.getAverageSpeedKmh();
 
         if (mode == TravelMode.FLIGHT) {
-            travelHours += 3.0; //adds 3 hours base for security and boarding
+            travelHours += 3.0; //adds 3-hours base for security and boarding
         } else if (mode == TravelMode.FERRY) {
-            travelHours += 1.0; // adds 1 hour base for boarding
+            travelHours += 1.0; // adds 1-hour base for boarding
         }
         return formatDecimalHours(travelHours);
     }
@@ -40,7 +40,7 @@ public class TravelMathUtil {
         double cost = 0.0;
 
         if (mode == TravelMode.FLIGHT) {
-            cost = (350.0 + (1.00 * distance)) * passengers;
+            cost = (350.0 + (distance)) * passengers;
         } else if (mode == TravelMode.TRAIN) {
             cost = (150.0 + (0.75 * distance)) * passengers;
         } else if (mode == TravelMode.FERRY) {
@@ -49,6 +49,8 @@ public class TravelMathUtil {
             //The numbers assume 15 km per liter of gas and 14kr per liter of gas.
         } else if (mode == TravelMode.CAR) {
             cost = (distance / 15.0) * 14.00;
+        } else if (mode == TravelMode.BUS) {
+            cost = (100.0 + (0.50 * distance)) * passengers;
         } else if (mode == TravelMode.BIKE) {
             cost = 0.0;
         }
@@ -56,7 +58,7 @@ public class TravelMathUtil {
         return String.format("%.2f", cost) + " kr. ";
     }
 
-    //Turns deical (4.19) into hours and minutes (4h 12 min)
+    //Turns decimal (4.19) into hours and minutes (4h 12 min)
     public static String formatDecimalHours(double totalDecimalHours) {
         int wholeHours = (int) totalDecimalHours;
         double leftoverDecimals = totalDecimalHours - wholeHours;
