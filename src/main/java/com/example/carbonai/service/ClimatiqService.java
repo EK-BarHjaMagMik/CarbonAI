@@ -32,7 +32,7 @@ public class ClimatiqService {
 
     // response record holding the CO2e value
     private record ClimatiqResponse(double co2e) {}
-
+    //test
     // this  method uses an instance client of Webclient to send a POST request to the Climatiq API, with the appropriate headers and body.
     // the body of the request is a ClimatiqRequest record which holds the EmissionFactor and Parameters records.
     // we then parse the response into a ClimatiqResponse record and return the co2e value.
