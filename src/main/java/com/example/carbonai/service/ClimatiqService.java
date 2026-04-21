@@ -10,14 +10,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class ClimatiqService {
 
+    @Value("${app.climatiq-api-key}")
+    private String apiKey;
+
     private final WebClient client = WebClient.create();
 
-    @Value("${app.climatiq-api-key}")
-
-    private String apiKey;
-    /// could hold all these records in a separate "ClimatqRecords" and call
-    /// them from there, but since they are only used by ClimatiqService class
-    /// Ai suggests private inner records as a cleaner choice here.
+    /*
+    could hold all these records in a separate "ClimatiqRecords" and call
+    them from there, but since they are only used by ClimatiqService class
+    Ai suggests private inner records as a cleaner choice here.
+     */
 
     // provides activity type and Climatiq dataversion to use on request
     private record EmissionFactor(String activity_id, String data_version) {}
@@ -31,9 +33,14 @@ public class ClimatiqService {
     // response record holding the CO2e value
     private record ClimatiqResponse(double co2e) {}
 
-
+    // this  method uses an instance client of Webclient to send a POST request to the Climatiq API, with the appropriate headers and body.
+    // the body of the request is a ClimatiqRequest record which holds the EmissionFactor and Parameters records.
+    // we then parse the response into a ClimatiqResponse record and return the co2e value.
     public double getEmissions(TravelMode mode, double distanceKm, int passengers) {
-        if (mode == TravelMode.BIKE) {return 0.0;} // Biking has zero emissions, so we can return early without making an API call}
+        if (mode == TravelMode.BIKE) {
+            return 0.0;
+        } // Biking has zero emissions, so we can return early without making an API call
+
         ClimatiqResponse response = client.post()
                 .uri("https://beta3.api.climatiq.io/estimate")
                 .header("Authorization", "Bearer " + apiKey)
