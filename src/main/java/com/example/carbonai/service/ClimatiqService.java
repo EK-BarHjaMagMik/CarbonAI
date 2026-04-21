@@ -1,14 +1,20 @@
 package com.example.carbonai.service;
 
+import com.example.carbonai.enums.TravelMode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Slf4j
 @Service
 public class ClimatiqService {
 
-
     private final WebClient client = WebClient.create();
 
+    @Value("${app.climatiq-api-key}")
+
+    private String apiKey;
     /// could hold all these records in a separate "ClimatqRecords" and call
     /// them from there, but since they are only used by ClimatiqService class
     /// Ai suggests private inner records as a cleaner choice here.
@@ -26,18 +32,29 @@ public class ClimatiqService {
     private record ClimatiqResponse(double co2e) {}
 
 
+    public double getEmissions(TravelMode mode, double distanceKm, int passengers) {
+        if (mode == TravelMode.BIKE) {return 0.0;} // Biking has zero emissions, so we can return early without making an API call}
+        ClimatiqResponse response = client.post()
+                .uri("https://beta3.api.climatiq.io/estimate")
+                .header("Authorization", "Bearer " + apiKey)
+                .bodyValue(new ClimatiqRequest(
+                        new EmissionFactor(getActivityId(mode), "^21"),
+                        new Parameters(distanceKm, "km", passengers)
+                ))
+                .retrieve()
+                .bodyToMono(ClimatiqResponse.class)
+                .block();
+        return response.co2e();
+    }
 
-/*
-    ClimatiqResponse response = client.post()
-            .uri("https://beta3.api.climatiq.io/estimate")
-            .header("Authorization", "Bearer " + apiKey)
-            .bodyValue(new ClimatiqRequest(
-                    new EmissionFactor(getActivityId(mode), "^21"),
-                    new Parameters(distanceKm, "km", passengers)
-            ))
-            .retrieve()
-            .bodyToMono(ClimatiqResponse.class)
-            .block();
-*/
-
+    private String getActivityId(TravelMode mode) {
+        return switch (mode) {
+            case CAR -> "passenger_vehicle-vehicle_type_car-fuel_source_na-distance_short-engine_size_na";
+            case BUS -> "passenger_vehicle-vehicle_type_bus-fuel_source_na-engine_size_na";
+            case TRAIN -> "passenger_train-route_type_na-fuel_source_na";
+            case FLIGHT -> "passenger_flight-route_type_na-aircraft_type_na-distance_na-class_na-rf_na-distance_uplift_na";
+            case FERRY -> "passenger_ferry-route_type_na-fuel_source_na";
+            default -> throw new IllegalArgumentException("Unsupported travel mode: " + mode);
+        };
+    }
 }
