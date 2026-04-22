@@ -1,12 +1,10 @@
 package com.example.carbonai.service;
 
 import com.example.carbonai.enums.TravelMode;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Slf4j
 @Service
 public class ClimatiqService {
 

@@ -1,59 +1,39 @@
 package com.example.carbonai.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
-/*
-This code utilizes WebClient along with several other classes from org.springframework.web.reactive.
-However, the code is NOT reactive due to the use of the block() method, which bridges the reactive code (WebClient)
-to our imperative code (the way we have used Spring Boot up until now).
-
-You will not truly benefit from WebClient unless you need to make several external requests in parallel.
-Additionally, the WebClient API is very clean, so if you are familiar with HTTP, it should be easy to
-understand what's going on in this code.
-*/
 
 @Service
 public class GeminiService {
 
-  public static final Logger logger = LoggerFactory.getLogger(GeminiService.class);
+    @Value("${app.gemini-api-key}")
+    private String apiKey;
 
-  // TODO:
-  /*
-  @Value("${app.gemini-api-key}")
-  private String API_KEY;
+    private Client client;
 
-  @Value("${app.url}")
-  public String URL;
+    //PostConstruct allows us to finish creating the GeminiService object before we try to use it.
+    //This allows the apiKey to be injected into the Client object.
+    @PostConstruct
+    public void init() {
+        //using Builder pattern to create a Client object
+        //This basically says "Get the client builder, set the API key on it, and then build the final, ready-to-use client object."
+        this.client = Client.builder().apiKey(apiKey).build();
+    }
 
-  @Value("${app.model}")
-  public String MODEL;
-
-  @Value("${app.temperature}")
-  public double TEMPERATURE;
-
-  @Value("${app.max_tokens}")
-  public int MAX_TOKENS;
-
-  @Value("${app.frequency_penalty}")
-  public double FREQUENCY_PENALTY;
-
-  @Value("${app.presence_penalty}")
-  public double PRESENCE_PENALTY;
-
-  @Value("${app.top_p}")
-  public double TOP_P;
-*/
-  private WebClient client;
-
-  public GeminiService() {
-    this.client = WebClient.create();
-  }
-
-  // Use this constructor for testing, to inject a mock client
-  public GeminiService(WebClient client) {
-    this.client = client;
-  }
+    public String generateAdvice(String prompt) {
+        try {
+            GenerateContentResponse response = client.models.generateContent(
+                    "gemini-1.5-flash-latest", // Using the latest flash model
+                    prompt,
+                    null // No specific configuration
+            );
+            return response.text();
+        } catch (Exception e) {
+            System.err.println("Error calling Gemini API: " + e.getMessage());
+            throw new RuntimeException("Error communicating with the Gemini API.", e);
+        }
+    }
 }
