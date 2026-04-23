@@ -60,15 +60,15 @@ public class TravelMathUtil {
         if (mode == TravelMode.FLIGHT) {
             cost = (350.0 + (distance)) * passengers;
         } else if (mode == TravelMode.TRAIN) {
-            cost = (150.0 + (0.75 * distance)) * passengers;
+            cost = (100.0 + (0.5 * distance)) * passengers;
         } else if (mode == TravelMode.FERRY) {
-            cost = (200.0 + (1.50 * distance)) * passengers;
+            cost = (200.0 + (1.50 * distance));
             //car fuel cost is split by amount of passengers
             //The numbers assume 15 km per liter of gas and 14kr per liter of gas.
         } else if (mode == TravelMode.CAR) {
             cost = (distance / 15.0) * 14.00;
         } else if (mode == TravelMode.BUS) {
-            cost = (100.0 + (0.50 * distance)) * passengers;
+            cost = (50.0 + (0.30 * distance)) * passengers;
         } else if (mode == TravelMode.BIKE) {
             cost = 0.0;
         }
