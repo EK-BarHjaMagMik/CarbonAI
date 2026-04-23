@@ -12,7 +12,7 @@ public class GeminiService {
     @Value("${app.gemini-api-key}")
     private String apiKey;
 
-    @Value("${app.gemini-model:gemini-2.5-flash}")
+    @Value("${app.gemini-model:models/gemini-1.5-flash}")
     private String modelName;
 
     private Client client;

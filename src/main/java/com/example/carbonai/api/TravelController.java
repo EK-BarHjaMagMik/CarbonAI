@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/analyze-trip")
-@CrossOrigin(origins = "*")
+/* @CrossOrigin(origins = "*") */
 public class TravelController {
 
     private final GeocodingService geocodingService;
