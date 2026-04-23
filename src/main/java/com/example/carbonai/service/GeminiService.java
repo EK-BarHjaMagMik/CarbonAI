@@ -12,6 +12,9 @@ public class GeminiService {
     @Value("${app.gemini-api-key}")
     private String apiKey;
 
+    @Value("${app.gemini-model:gemini-2.5-flash}")
+    private String modelName;
+
     private Client client;
 
     //PostConstruct allows us to finish creating the GeminiService object before we try to use it.
@@ -26,13 +29,17 @@ public class GeminiService {
     public String generateAdvice(String prompt) {
         try {
             GenerateContentResponse response = client.models.generateContent(
-                    "gemini-1.5-flash-latest", // Using the latest flash model
+                    modelName,
                     prompt,
                     null // No specific configuration
             );
-            return response.text();
+            String text = response.text();
+            if (text == null || text.isBlank()) {
+                throw new IllegalStateException("Gemini returned an empty response for model: " + modelName);
+            }
+            return text;
         } catch (Exception e) {
-            System.err.println("Error calling Gemini API: " + e.getMessage());
+            System.err.println("Error calling Gemini API with model " + modelName + ": " + e.getMessage());
             throw new RuntimeException("Error communicating with the Gemini API.", e);
         }
     }
