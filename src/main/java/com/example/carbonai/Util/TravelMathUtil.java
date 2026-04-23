@@ -25,13 +25,31 @@ public class TravelMathUtil {
         return distance;
     }
 
+    // the ferry activityid in climatiq is based on car-passenger-ferry.
+    // we therefore assume a ferry distance based on total distance and the remainder by car.
+    // that way the estimated time from a to b isn't averagely 30km/h for the entire distance.
+    // as our ferries can't (yet) travel on land.
     public static String estimateTime(double distance, TravelMode mode) {
-        double travelHours = distance / mode.getAverageSpeedKmh();
+        double travelHours;
 
-        if (mode == TravelMode.FLIGHT) {
-            travelHours += 3.0; //adds 3-hours base for security and boarding
-        } else if (mode == TravelMode.FERRY) {
-            travelHours += 1.0; // adds 1-hour base for boarding
+        if (mode == TravelMode.FERRY) {
+            double ferryKm;
+            if (distance <= 100) {
+                ferryKm = distance;
+            } else if (distance <= 400) {
+                ferryKm = 80;
+            } else {
+                ferryKm = 160;
+            }
+            double carKm = distance - ferryKm;
+            travelHours = (ferryKm / TravelMode.FERRY.getAverageSpeedKmh())
+                        + (carKm / TravelMode.CAR.getAverageSpeedKmh())
+                        + 1.0; // boarding overhead
+        } else {
+            travelHours = distance / mode.getAverageSpeedKmh();
+            if (mode == TravelMode.FLIGHT) {
+                travelHours += 3.0;
+            }
         }
         return formatDecimalHours(travelHours);
     }

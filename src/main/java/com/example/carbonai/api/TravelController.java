@@ -28,8 +28,6 @@ public class TravelController {
         this.geminiService = geminiService;
     }
 
-
-
     @GetMapping
     public TripAnalysisResponse analyzeTrip(@RequestParam String from, @RequestParam String to, @RequestParam int passengers) {
 
@@ -77,6 +75,7 @@ public class TravelController {
         try {
             return climatiqService.getEmissions(mode, distanceKm, passengers);
         } catch (Exception e) {
+            System.err.println("[Climatiq FAILED] mode=" + mode + " | " + e.getClass().getSimpleName() + ": " + e.getMessage());
             return fallbackEmissions(mode, distanceKm, passengers);
         }
     }
@@ -176,5 +175,4 @@ public class TravelController {
         double[] coords = geocodingService.getCoordinates(city);
         return "lat=" + coords[0] + ", lon=" + coords[1];
     }
-
 }
