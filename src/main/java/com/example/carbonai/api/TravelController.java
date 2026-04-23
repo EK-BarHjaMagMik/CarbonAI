@@ -39,10 +39,17 @@ public class TravelController {
         );
 
         List<TripAnalysisResponse.ModeDetails> modes = Arrays.stream(TravelMode.values())
-                .map(mode -> buildModeDetails(mode, rawDistanceKm, passengers))
+                .map(mode -> {
+                    double tripDistanceKm = TravelMathUtil.applyRoadMultiplier(rawDistanceKm, mode);
+                    double co2e = climatiqService.getEmissions(mode, tripDistanceKm, passengers);
+                    String time = TravelMathUtil.estimateTime(tripDistanceKm, mode);
+                    String cost = TravelMathUtil.estimateCost(tripDistanceKm, mode, passengers);
+                    return new TripAnalysisResponse.ModeDetails(mode.name(), co2e, time, cost);
+                })
                 .toList();
 
         double lowestCo2 = modes.stream()
+                .filter(m -> m.co2() > 0)
                 .mapToDouble(TripAnalysisResponse.ModeDetails::co2)
                 .min()
                 .orElse(0.0);
@@ -52,7 +59,7 @@ public class TravelController {
                 .orElse(0.0);
 
         String prompt = buildGeminiPrompt(from, to, passengers, rawDistanceKm, modes);
-        String aiRecommendation = generateRecommendation(prompt, modes);
+        String aiRecommendation = geminiService.generateAdvice(prompt);
 
         return new TripAnalysisResponse(
                 (int) Math.round(rawDistanceKm),
@@ -61,35 +68,6 @@ public class TravelController {
                 modes,
                 aiRecommendation
         );
-    }
-
-    private TripAnalysisResponse.ModeDetails buildModeDetails(TravelMode mode, double rawDistanceKm, int passengers) {
-        double tripDistanceKm = TravelMathUtil.applyRoadMultiplier(rawDistanceKm, mode);
-        double co2e = calculateEmissions(mode, tripDistanceKm, passengers);
-        String time = TravelMathUtil.estimateTime(tripDistanceKm, mode);
-        String cost = TravelMathUtil.estimateCost(tripDistanceKm, mode, passengers);
-        return new TripAnalysisResponse.ModeDetails(mode.name(), co2e, time, cost);
-    }
-
-    private double calculateEmissions(TravelMode mode, double distanceKm, int passengers) {
-        try {
-            return climatiqService.getEmissions(mode, distanceKm, passengers);
-        } catch (Exception e) {
-            System.err.println("[Climatiq FAILED] mode=" + mode + " | " + e.getClass().getSimpleName() + ": " + e.getMessage());
-            return fallbackEmissions(mode, distanceKm, passengers);
-        }
-    }
-
-    private double fallbackEmissions(TravelMode mode, double distanceKm, int passengers) {
-        double perKmFactor = switch (mode) {
-            case FLIGHT -> 0.23;
-            case TRAIN -> 0.04;
-            case CAR -> 0.16;
-            case FERRY -> 0.11;
-            case BUS -> 0.07;
-            case BIKE -> 0.0;
-        };
-        return Math.round(distanceKm * perKmFactor * passengers * 100.0) / 100.0;
     }
 
     private String buildGeminiPrompt(String from, String to, int passengers, double rawDistanceKm, List<TripAnalysisResponse.ModeDetails> modes) {
@@ -108,71 +86,5 @@ public class TravelController {
                 + "Use short, practical explanations and mention CO2, time, and cost.\n\n"
                 + "Calculated options:\n"
                 + modeSummary;
-    }
-
-    private String generateRecommendation(String prompt, List<TripAnalysisResponse.ModeDetails> modes) {
-        try {
-            String response = geminiService.generateAdvice(prompt);
-            if (response != null && !response.isBlank()) {
-                return response;
-            }
-        } catch (Exception ignored) {
-            // Fall back to a deterministic local recommendation so the frontend still renders.
-        }
-        return buildFallbackRecommendation(modes);
-    }
-
-    private String buildFallbackRecommendation(List<TripAnalysisResponse.ModeDetails> modes) {
-        TripAnalysisResponse.ModeDetails topPick = modes.stream()
-                .min(Comparator.comparingDouble(TripAnalysisResponse.ModeDetails::co2))
-                .orElse(null);
-        TripAnalysisResponse.ModeDetails budget = modes.stream()
-                .min(Comparator.comparingDouble(this::extractCostValue))
-                .orElse(null);
-        TripAnalysisResponse.ModeDetails speed = modes.stream()
-                .min(Comparator.comparingDouble(this::extractHoursValue))
-                .orElse(null);
-
-        return "🥇 Top Pick: " + describeMode(topPick) + "\n\n"
-                + "💸 Budget Option: " + describeMode(budget) + "\n\n"
-                + "⏱️ Speed Demon: " + describeMode(speed) + "\n\n"
-                + "📊 Breakdown: This is a local fallback recommendation because Gemini did not return text."
-                + " The table above still shows CO2, time, and cost for each mode.";
-    }
-
-    private double extractCostValue(TripAnalysisResponse.ModeDetails mode) {
-        String cleaned = mode.cost().replace("kr.", "").replace(" ", "").trim();
-        try {
-            return Double.parseDouble(cleaned);
-        } catch (Exception e) {
-            return Double.MAX_VALUE;
-        }
-    }
-
-    private double extractHoursValue(TripAnalysisResponse.ModeDetails mode) {
-        String time = mode.time().toLowerCase();
-        try {
-            String[] parts = time.split(" ");
-            double hours = Double.parseDouble(parts[0]);
-            double minutes = parts.length > 3 ? Double.parseDouble(parts[3]) : 0.0;
-            return hours + (minutes / 60.0);
-        } catch (Exception e) {
-            return Double.MAX_VALUE;
-        }
-    }
-
-    private String describeMode(TripAnalysisResponse.ModeDetails mode) {
-        if (mode == null) {
-            return "No data available.";
-        }
-        return mode.name() + " — " + mode.co2() + " kg CO2e, " + mode.time() + ", " + mode.cost();
-    }
-
-    // TEST METHOD that successfully returns the latitude and longitude of a city
-    // when we send a GET request to /api/v1/geocode?city=CityName
-    @GetMapping("/geocode")
-    public String testGeocode(@RequestParam String city) {
-        double[] coords = geocodingService.getCoordinates(city);
-        return "lat=" + coords[0] + ", lon=" + coords[1];
     }
 }

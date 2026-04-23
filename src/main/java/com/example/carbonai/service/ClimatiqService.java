@@ -43,7 +43,7 @@ public class ClimatiqService {
                 .uri("https://api.climatiq.io/data/v1/estimate")
                 .header("Authorization", "Bearer " + apiKey)
                 .bodyValue(new ClimatiqRequest(
-                        new EmissionFactor(getActivityId(mode), "^21"),
+                        new EmissionFactor(getActivityId(mode), "^33"),
                         new Parameters(distanceKm, "km", passengers)
                 ))
                 .retrieve()
@@ -57,8 +57,8 @@ public class ClimatiqService {
             case CAR -> "passenger_vehicle-vehicle_type_car-fuel_source_na-distance_short-engine_size_na";
             case BUS -> "passenger_vehicle-vehicle_type_bus-fuel_source_na-distance_na-engine_size_na";
             case TRAIN -> "passenger_train-route_type_na-fuel_source_na";
-            case FLIGHT -> "passenger_flight-route_type_domestic-aircraft_type_na-distance_na-class_na-rf_included-distance_uplift_included";
-            case FERRY -> "passenger_ferry-route_type_car_passenger-fuel_source_na";
+            case FLIGHT -> "passenger_flight-route_type_na-aircraft_type_na-distance_na-class_na-rf_na-distance_uplift_na";
+            case FERRY -> "passenger_ferry-route_type_na-fuel_source_na";
             default -> throw new IllegalArgumentException("Unsupported travel mode: " + mode);
         };
     }
