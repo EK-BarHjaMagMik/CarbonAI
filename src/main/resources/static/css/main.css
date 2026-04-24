@@ -129,7 +129,50 @@ body {
     padding: 1.25rem 1.5rem;
     line-height: 1.75;
     font-size: 0.95rem;
-    white-space: pre-wrap;
+}
+
+.ai-box h1, .ai-box h2, .ai-box h3, .ai-box h4 {
+    color: #1a6b2f;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.ai-box h2 {
+    font-size: 1.25rem;
+    border-bottom: 2px solid #e2f0e6;
+    padding-bottom: 0.4rem;
+}
+
+.ai-box h3 {
+    font-size: 1.1rem;
+}
+
+.ai-box p {
+    margin-bottom: 1rem;
+    color: #2c3e32;
+}
+
+.ai-box ul {
+    padding-left: 1.2rem;
+    margin-bottom: 1.25rem;
+}
+
+.ai-box li {
+    margin-bottom: 0.4rem;
+    color: #2c3e32;
+}
+
+.ai-box strong {
+    color: #16421f;
+}
+
+.ai-box > *:first-child {
+    margin-top: 0;
+}
+
+.ai-box > *:last-child {
+    margin-bottom: 0;
 }
 
 /* ── Debug Panel ── */

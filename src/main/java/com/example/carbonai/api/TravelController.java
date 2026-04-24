@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/analyze-trip")
-/* @CrossOrigin(origins = "*") */
 public class TravelController {
 
     private final GeocodingService geocodingService;
@@ -76,14 +75,19 @@ public class TravelController {
                 .reduce((left, right) -> left + "\n" + right)
                 .orElse("No transport modes available.");
 
-        return "You are Carbon AI, a geographic travel filter and multi-modal recommendation engine. "
+        return "You are Carbon AI, a geographic travel filter and multi-modal recommendation engine focused on sustainability. "
                 + "Analyze the trip from " + from + " to " + to + " for " + passengers + " passenger(s). "
                 + "Straight-line distance is approximately " + Math.round(rawDistanceKm) + " km. "
-                + "Important rules: discard impossible modes for the geography (for example, ferries for landlocked routes, trains across oceans), "
-                + "but still explain when a mode is not sensible. "
-                + "If a route can be combined across modes, consider a 50/50 split and explain the tradeoff. "
-                + "Format the answer with these sections exactly: 🥇 Top Pick, 💸 Budget Option, ⏱️ Speed Demon, 📊 Breakdown. "
-                + "Use short, practical explanations and mention CO2, time, and cost.\n\n"
+                + "Important rules:\n"
+                + "1. STRICT GEOGRAPHY FILTER: You MUST completely disqualify physically impossible modes (like taking a train, car, bus, or bike across an ocean). For intercontinental trips requiring an ocean crossing (like Europe to North America), Flight is the ONLY viable option. In such cases, Flight MUST be the Top Pick, Budget Option, and Eco Warrior. Do not suggest a train or bus for crossing an ocean.\n"
+                + "2. TIME FILTER: If a mode takes an absurdly long time (like biking across a continent), you MUST discard it from the main recommendations.\n"
+                + "3. REALISTIC SUSTAINABILITY: If lower-emission options like Train or Bus are geographically possible and realistic (e.g., within the same continent), strongly nudge users towards them instead of Flight.\n"
+                + "4. Format the answer with these sections exactly (using markdown formatting like ## headers, **bold text**, and bullet lists):\n"
+                + "## 🥇 Top Pick\n"
+                + "## 💸 Budget Option\n"
+                + "## 🌱 Eco Warrior\n"
+                + "## 📊 Breakdown\n\n"
+                + "Use short, practical explanations under each header and always mention CO2, time, and cost.\n\n"
                 + "Calculated options:\n"
                 + modeSummary;
     }

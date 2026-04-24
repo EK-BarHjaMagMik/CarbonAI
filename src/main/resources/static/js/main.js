@@ -18,11 +18,6 @@ const summaryHighest  = document.getElementById('summaryHighest');
 const modesContainer    = document.getElementById('modesContainer');
 const aiRecommendation  = document.getElementById('aiRecommendation');
 
-// Debug
-const debugCity       = document.getElementById('debugCity');
-const debugGeocodeBtn = document.getElementById('debugGeocodeBtn');
-const debugOutput     = document.getElementById('debugOutput');
-
 // --- Trip Analysis ---
 tripForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -97,37 +92,21 @@ function renderResults(data) {
         modesContainer.appendChild(row);
     });
 
-    // AI recommendation — preserve line breaks and emoji
+    // AI recommendation — parse markdown to HTML
     const raw = data.aiRecommendation ?? 'No recommendation available.';
-    aiRecommendation.innerHTML = raw
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\n/g, '<br>');
+    if (typeof marked !== 'undefined') {
+        aiRecommendation.innerHTML = marked.parse(raw);
+    } else {
+        aiRecommendation.innerHTML = raw
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+    }
 
     resultsSection.classList.remove('d-none');
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-
-// --- Debug: Geocoding ---
-debugGeocodeBtn.addEventListener('click', async () => {
-    const city = debugCity.value.trim();
-    if (!city) return;
-
-    debugGeocodeBtn.disabled = true;
-    debugOutput.classList.remove('d-none');
-    debugOutput.textContent = 'Loading…';
-
-    try {
-        const response = await fetch(`${API_BASE}/analyze-trip/geocode?city=${encodeURIComponent(city)}`);
-        const text = await response.text();
-        debugOutput.textContent = response.ok ? text : `Error ${response.status}: ${text}`;
-    } catch (err) {
-        debugOutput.textContent = `Network error: ${err.message}`;
-    } finally {
-        debugGeocodeBtn.disabled = false;
-    }
-});
 
 // --- Helpers ---
 function setLoading(on) {
