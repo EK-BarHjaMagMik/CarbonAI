@@ -10,7 +10,6 @@ import com.example.carbonai.service.GeocodingService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 @RestController
